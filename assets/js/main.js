@@ -302,9 +302,8 @@
       }
       ctx.globalAlpha = 1;
     }
-    function drawHole(b, time, scale) {
-      scale = scale || 1;
-      var R = opts.holeR * scale, lw = Math.sqrt(scale), spin = time * 0.00042 * opts.speed;
+    function drawHole(b, time) {
+      var R = opts.holeR, spin = time * 0.00042 * opts.speed;
       ctx.save();
       ctx.translate(b.x, b.y); ctx.rotate(ROT);
       // warm haze
@@ -320,7 +319,7 @@
       for (i = 0; i < disc.length; i++) {
         p = disc[i]; th = p.th + spin * Math.pow(1.45 / p.r, 1.5) * 3; rr = p.r * R;
         if (Math.sin(th) >= 0) continue;
-        a0 = th - p.tr; ctx.strokeStyle = discColor(p.r, th, .55); ctx.lineWidth = p.w * lw;
+        a0 = th - p.tr; ctx.strokeStyle = discColor(p.r, th, .55); ctx.lineWidth = p.w;
         ctx.beginPath(); ctx.moveTo(Math.cos(a0) * rr, Math.sin(a0) * rr * TILT); ctx.lineTo(Math.cos(th) * rr, Math.sin(th) * rr * TILT); ctx.stroke();
       }
       // 2. the far side again, lensed up and over the top of the shadow
@@ -331,7 +330,7 @@
         // squeeze the angle toward the top so the arch hugs the shadow
         a1 = Math.PI + ((th % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI);
         a0 = a1 - p.tr * 1.4;
-        ctx.strokeStyle = discColor(p.r, th, .7); ctx.lineWidth = p.w * .9 * lw;
+        ctx.strokeStyle = discColor(p.r, th, .7); ctx.lineWidth = p.w * .9;
         ctx.beginPath(); ctx.arc(0, 0, rr, a0, a1); ctx.stroke();
       }
       // 3. faint secondary image under the shadow
@@ -350,7 +349,7 @@
       // 5. photon ring
       ctx.globalCompositeOperation = "lighter";
       ctx.shadowColor = "rgba(255,200,150,.9)"; ctx.shadowBlur = 12;
-      ctx.strokeStyle = "rgba(255,232,205,.75)"; ctx.lineWidth = lw;
+      ctx.strokeStyle = "rgba(255,232,205,.75)"; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(0, 0, R * 1.025, 0, Math.PI * 2); ctx.stroke();
       ctx.shadowBlur = 0;
       // 6. near half of the disc, crossing in front of the shadow
@@ -358,7 +357,7 @@
       for (i = 0; i < disc.length; i++) {
         p = disc[i]; th = p.th + spin * Math.pow(1.45 / p.r, 1.5) * 3; rr = p.r * R;
         if (Math.sin(th) < 0) continue;
-        a0 = th - p.tr; ctx.strokeStyle = discColor(p.r, th, .9); ctx.lineWidth = p.w * 1.15 * lw;
+        a0 = th - p.tr; ctx.strokeStyle = discColor(p.r, th, .9); ctx.lineWidth = p.w * 1.15;
         ctx.beginPath(); ctx.moveTo(Math.cos(a0) * rr, Math.sin(a0) * rr * TILT); ctx.lineTo(Math.cos(th) * rr, Math.sin(th) * rr * TILT); ctx.stroke();
       }
       ctx.restore();
@@ -373,15 +372,6 @@
       else { var s = (now - t0) * 0.0002; hand.tx = W * opts.hx + Math.cos(s) * W * .14; hand.ty = H * opts.hy + Math.sin(s * 1.7) * H * .16; }
       hand.x += (hand.tx - hand.x) * 0.07; hand.y += (hand.ty - hand.y) * 0.07;
       var b = hole(now - t0);
-      // scroll-driven dive: the hole drifts to the centre and grows until it swallows the screen
-      var dv = opts.dive ? opts.dive() : 0, scale = 1, fade = 1;
-      if (dv > 0) {
-        var c1 = Math.min(1, dv * 2.2); c1 = c1 * c1 * (3 - 2 * c1);
-        b.x += (W / 2 - b.x) * c1; b.y += (H / 2 - b.y) * c1;
-        var grow = Math.min(1, dv / .92);
-        scale = 1 + Math.pow(grow, 2.4) * (Math.hypot(W, H) / 2 / opts.holeR) * 1.25;
-        fade = Math.max(0, 1 - dv * 1.8);
-      }
       ctx.clearRect(0, 0, W, H);
       ctx.lineCap = "round";
       var signal = opts.signal;
@@ -399,19 +389,18 @@
         p.a += diff * 0.12;
         var mag = Math.sqrt(fx * fx + fy * fy) * 9e4;
         var alpha = Math.min(.85, .1 + mag * .5);
-        if (fade <= 0) break;
-        var R0 = opts.holeR * scale;
+        var R0 = opts.holeR;
         if (r2 < R0 * 1.9) continue; // swallowed by the disc
-        alpha *= Math.min(1, (r2 - R0 * 1.9) / (R0 * 1.6)) * fade;
-        var near = Math.max(0, 1 - r1 / 160) * fade;
+        alpha *= Math.min(1, (r2 - R0 * 1.9) / (R0 * 1.6));
+        var near = Math.max(0, 1 - r1 / 160);
         ctx.strokeStyle = near > 0.02 ? "rgba(" + Math.round(239 + (226 - 239) * near) + "," + Math.round(231 + (72 - 231) * near) + "," + Math.round(221 + (31 - 221) * near) + "," + Math.min(1, alpha + near * .5) + ")" : "rgba(239,231,221," + alpha + ")";
         ctx.lineWidth = .8 + near * .9;
         var c = Math.cos(p.a) * p.l * .5, s = Math.sin(p.a) * p.l * .5;
         ctx.beginPath(); ctx.moveTo(p.x - c, p.y - s); ctx.lineTo(p.x + c, p.y + s); ctx.stroke();
       }
-      drawHole(b, now - t0, scale);
+      drawHole(b, now - t0);
       // the hand's pole
-      if (fade > 0) { ctx.globalAlpha = fade; ctx.beginPath(); ctx.arc(hand.x, hand.y, 3, 0, Math.PI * 2); ctx.fillStyle = signal; ctx.fill(); ctx.globalAlpha = 1; }
+      ctx.beginPath(); ctx.arc(hand.x, hand.y, 3, 0, Math.PI * 2); ctx.fillStyle = signal; ctx.fill();
     }
     function loop(now) { if (!running) return; draw(now); requestAnimationFrame(loop); }
     function start() { if (running || reduced) return; running = true; requestAnimationFrame(loop); }
@@ -427,26 +416,7 @@
   $("#year").textContent = new Date().getFullYear();
   render();
   var mobile = innerWidth < 700;
-  var track = $("#hero-track"), diveP = 0;
-  var heroBits = { inner: $(".hero-inner"), hint: $(".hero-hint"), scroll: $(".hero-scroll"), feature: $(".feature"), veil: $(".dive-veil") };
-  function onScroll() {
-    if (reduced) return;
-    var r = track.getBoundingClientRect(), span = r.height - innerHeight;
-    diveP = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
-    var a = Math.max(0, 1 - diveP * 2.4);
-    heroBits.inner.style.opacity = a;
-    heroBits.inner.style.transform = "translateY(" + (-diveP * 120) + "px) scale(" + (1 + diveP * .08) + ")";
-    heroBits.hint.style.opacity = heroBits.scroll.style.opacity = heroBits.feature.style.opacity = Math.max(0, 1 - diveP * 4);
-    heroBits.feature.style.pointerEvents = diveP > .2 ? "none" : "";
-    // light at the far side: a disc of paper opens from the centre of the darkness
-    var v = Math.min(1, Math.max(0, (diveP - .8) / .2));
-    heroBits.veil.style.opacity = v > 0 ? 1 : 0;
-    heroBits.veil.style.clipPath = "circle(" + (Math.pow(v, 1.6) * 75).toFixed(2) + "% at 50% 50%)";
-  }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll);
-  onScroll();
-  new Field($("#field"), { dive: function () { return diveP; }, gap: 22, hx: .3, hy: .4, bx: mobile ? .7 : .72, by: mobile ? .3 : .42, holeR: mobile ? 30 : 46, speed: 1, signal: "#e2481f" });
+  new Field($("#field"), { gap: 22, hx: .3, hy: .4, bx: mobile ? .7 : .72, by: mobile ? .3 : .42, holeR: mobile ? 30 : 46, speed: 1, signal: "#e2481f" });
   new Field($("#field2"), { gap: 26, hx: .3, hy: .5, bx: .78, by: .5, holeR: mobile ? 20 : 36, speed: .7, signal: "#e2481f" });
   fromHash();
 })();
