@@ -1,0 +1,324 @@
+(function () {
+  "use strict";
+
+  var UI = window.UI, WORKS = window.WORKS, CATS = window.CATEGORIES, CV = window.CV, CONTACT = window.CONTACT;
+  var LANGS = ["en", "nl", "fr"];
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* ---------------- language ---------------- */
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  var lang = (function () {
+    var q = new URLSearchParams(location.search).get("lang");
+    if (LANGS.indexOf(q) > -1) return q;
+    var s = store("sn-lang");
+    if (LANGS.indexOf(s) > -1) return s;
+    var n = (navigator.language || "en").slice(0, 2).toLowerCase();
+    return LANGS.indexOf(n) > -1 ? n : "en";
+  })();
+  function t(v) { if (v == null) return ""; if (typeof v === "string") return v; return v[lang] != null ? v[lang] : v.en; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  function setLang(l) {
+    lang = l; store("sn-lang", l);
+    document.documentElement.lang = l;
+    render();
+    if (current) fillRoom(current);
+  }
+
+  /* ---------------- rendering ---------------- */
+  var filter = "all";
+  // irregular placements on a 12-column grid (desktop) and 6-column (mobile)
+  var PATTERN = [
+    { c: 1, s: 6, y: "0" }, { c: 8, s: 4, y: "14vw" },
+    { c: 3, s: 4, y: "0" }, { c: 8, s: 5, y: "8vw" },
+    { c: 1, s: 4, y: "6vw" }, { c: 6, s: 3, y: "16vw" }, { c: 10, s: 3, y: "2vw" },
+    { c: 2, s: 5, y: "0" }, { c: 8, s: 4, y: "10vw" }
+  ];
+  var MPATTERN = [{ c: 1, s: 6 }, { c: 2, s: 5 }, { c: 1, s: 5 }];
+
+  function render() {
+    $$("[data-t]").forEach(function (el) { el.textContent = t(UI[el.getAttribute("data-t")]); });
+    $$("[data-t-aria]").forEach(function (el) { el.setAttribute("aria-label", t(UI[el.getAttribute("data-t-aria")])); });
+    $$(".lang button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-lang") === lang ? "true" : "false"); });
+    renderFilters();
+    renderStations();
+    renderPoem();
+    $("#bio").innerHTML = UI.bio[lang].map(function (p) { return "<p class='reveal'>" + esc(p) + "</p>"; }).join("");
+    renderCV();
+    renderContact();
+    observeReveals();
+  }
+
+  function renderFilters() {
+    var items = [{ id: "all", label: UI.all }].concat(CATS);
+    $("#filters").innerHTML = items.map(function (c) {
+      return "<button role='tab' data-filter='" + c.id + "' aria-selected='" + (filter === c.id) + "'>" + esc(t(c.label)) + "</button>";
+    }).join("");
+  }
+
+  function renderStations() {
+    $("#stations").innerHTML = CATS.map(function (cat) {
+      var works = WORKS.filter(function (w) { return w.cat === cat.id; });
+      var cards = works.map(function (w, i) {
+        var p = PATTERN[i % PATTERN.length], m = MPATTERN[i % MPATTERN.length], img = w.images[0];
+        // keep small source photos from being blown up past their resolution
+        var span = Math.min(p.s, img[1] < 400 ? 3 : img[1] < 600 ? 4 : 12);
+        return "<a class='card reveal' href='#/work/" + w.id + "' data-work='" + w.id + "' style='--c:" + p.c + ";--s:" + span + ";--y:" + p.y + ";--mc:" + m.c + ";--ms:" + m.s + "'>" +
+          "<div class='card-media'><img src='assets/img/works/" + img[0] + "-sm.jpg' alt='" + esc(t(w.title)) + "' loading='lazy' width='" + img[1] + "' height='" + img[2] + "'></div>" +
+          "<div class='card-cap'><span class='card-title'>" + esc(t(w.title)) + (w.sub ? "<em>" + esc(t(w.sub)) + "</em>" : "") + "</span><span class='card-year'>" + esc(w.year) + "</span></div></a>";
+      }).join("");
+      return "<section class='station' data-cat='" + cat.id + "'" + (filter !== "all" && filter !== cat.id ? " hidden" : "") + ">" +
+        "<header class='station-head reveal'><span class='station-num'>" + cat.n + "</span><span class='station-label'><small>" + esc(t(UI.station)) + " " + cat.n + "</small><span>" + esc(t(cat.label)) + "</span></span></header>" +
+        "<div class='station-grid'>" + cards + "</div></section>";
+    }).join("");
+  }
+
+  function renderPoem() {
+    $("#poem").innerHTML = t(UI.poem).split("\n").map(function (line, i) {
+      var refrain = /^(Dans met mij|Dance with me|Danse avec moi)/.test(line) && i > 0;
+      return "<span class='" + (refrain ? "refrain" : "") + "'>" + esc(line) + "</span>";
+    }).join("");
+    if (reduced) { $$("#poem span").forEach(function (s) { s.classList.add("in"); }); return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { rootMargin: "0px 0px -22% 0px" });
+    $$("#poem span").forEach(function (s) { io.observe(s); });
+  }
+
+  function cvList(rows) {
+    return "<ol>" + rows.map(function (r) {
+      var p = r.p ? "<span class='cv-p'>" + esc(t(r.p)) + "</span>" : "";
+      return "<li class='reveal'><span class='cv-y'>" + esc(r.y) + "</span><span class='cv-t'>" + esc(t(r.t)) + p + "</span></li>";
+    }).join("") + "</ol>";
+  }
+  function renderCV() {
+    $("#cvgrid").innerHTML =
+      "<div class='cv-block'><h3>" + esc(t(UI.cvEducation)) + "</h3>" + cvList(CV.education) +
+      "<h3>" + esc(t(UI.cvResearch)) + "</h3>" + cvList(CV.research) + "</div>" +
+      "<div class='cv-block'><h3>" + esc(t(UI.cvExhibitions)) + "</h3>" + cvList(CV.exhibitions) +
+      "<h3>" + esc(t(UI.cvProfessional)) + "</h3>" + cvList(CV.professional) + "</div>";
+  }
+
+  function renderContact() {
+    var out = [];
+    if (CONTACT.email) out.push("<a href='mailto:" + esc(CONTACT.email) + "'>" + esc(CONTACT.email) + "</a>");
+    if (CONTACT.instagram) out.push("<a href='https://instagram.com/" + esc(CONTACT.instagram) + "' target='_blank' rel='noopener'>Instagram ↗</a>");
+    if (!out.length) out.push("<span class='pending'>" + esc(t(UI.contactPending)) + "</span>");
+    $("#contactlinks").innerHTML = out.join("");
+    $("#contactloc").textContent = t(CONTACT.location);
+  }
+
+  /* ---------------- reveal on scroll ---------------- */
+  var revealIO = reduced ? null : new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); revealIO.unobserve(e.target); } });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  function observeReveals() {
+    $$(".reveal:not(.in)").forEach(function (el) { if (revealIO) revealIO.observe(el); else el.classList.add("in"); });
+  }
+
+  /* ---------------- work room ---------------- */
+  var current = null, lastFocus = null;
+  var room = $("#room");
+
+  function visibleWorks() { return WORKS.filter(function (w) { return filter === "all" || w.cat === filter; }); }
+
+  function fillRoom(w) {
+    var cat = CATS.filter(function (c) { return c.id === w.cat; })[0];
+    $("#room-meta").textContent = t(UI.station) + " " + cat.n + " · " + t(cat.label);
+    $("#room-title").textContent = t(w.title);
+    $("#room-sub").textContent = t(w.sub);
+    var spec = [];
+    if (w.year) spec.push(["Year", w.year]);
+    if (w.medium) spec.push([{ en: "Medium", nl: "Materiaal", fr: "Matériaux" }, t(w.medium)]);
+    if (w.size) spec.push([{ en: "Size", nl: "Afmetingen", fr: "Dimensions" }, w.size]);
+    $("#room-spec").innerHTML = spec.map(function (s) {
+      var k = s[0] === "Year" ? t({ en: "Year", nl: "Jaar", fr: "Année" }) : t(s[0]);
+      return "<dt>" + esc(k) + "</dt><dd>" + esc(s[1]) + "</dd>";
+    }).join("");
+    var text = "";
+    if (w.lead) text += "<p class='lead'>" + esc(t(w.lead)) + "</p>";
+    if (w.text) text += t(w.text).split("\n\n").map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("");
+    if (w.quote) text += "<p class='lead' style='font-size:22px'>“" + esc(t(UI.quote)) + "”</p>";
+    if (w.poem) text += "<p class='poem-mini'>" + esc(t(UI.poem)) + "</p>";
+    $("#room-text").innerHTML = text;
+    $("#room-images").innerHTML = w.images.map(function (img, i) {
+      return "<figure><img src='assets/img/works/" + img[0] + ".jpg' alt='" + esc(t(w.title)) + " — " + (i + 1) + "' width='" + img[1] + "' height='" + img[2] + "'" + (i ? " loading='lazy'" : "") + "></figure>";
+    }).join("");
+    var list = visibleWorks(), idx = list.indexOf(w);
+    $("#room-count").textContent = (idx + 1) + " / " + list.length;
+  }
+
+  function openRoom(id, origin) {
+    var w = WORKS.filter(function (x) { return x.id === id; })[0];
+    if (!w) return;
+    if (!current) lastFocus = document.activeElement;
+    current = w;
+    cursor.classList.remove("is-work", "is-link");
+    fillRoom(w);
+    if (origin) { room.style.setProperty("--ox", origin.x + "px"); room.style.setProperty("--oy", origin.y + "px"); }
+    room.hidden = false;
+    room.classList.remove("open"); void room.offsetWidth; room.classList.add("open");
+    $("#room-scroll").scrollTop = 0;
+    document.body.classList.add("locked");
+    $("#room-close").focus({ preventScroll: true });
+    var h = "#/work/" + id;
+    if (location.hash !== h) history.pushState(null, "", h);
+  }
+
+  function closeRoom(fromHash) {
+    if (!current) return;
+    current = null;
+    room.hidden = true;
+    document.body.classList.remove("locked");
+    if (!fromHash) history.pushState(null, "", location.pathname + location.search + "#works");
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  }
+
+  function step(d) {
+    var list = visibleWorks(), i = list.indexOf(current);
+    if (i < 0) list = WORKS, i = WORKS.indexOf(current);
+    openRoom(list[(i + d + list.length) % list.length].id);
+  }
+
+  function fromHash() {
+    var m = location.hash.match(/^#\/work\/([\w-]+)/);
+    if (m) openRoom(m[1]); else closeRoom(true);
+  }
+
+  /* ---------------- events ---------------- */
+  document.addEventListener("click", function (e) {
+    var l = e.target.closest("[data-lang]");
+    if (l) { setLang(l.getAttribute("data-lang")); return; }
+    var f = e.target.closest("[data-filter]");
+    if (f) {
+      filter = f.getAttribute("data-filter");
+      renderFilters();
+      $$(".station").forEach(function (s) { s.hidden = !(filter === "all" || filter === s.getAttribute("data-cat")); });
+      return;
+    }
+    var c = e.target.closest("[data-work]");
+    if (c) { e.preventDefault(); openRoom(c.getAttribute("data-work"), { x: e.clientX, y: e.clientY }); }
+  });
+  $("#room-close").addEventListener("click", function () { closeRoom(); });
+  $("#room-prev").addEventListener("click", function () { step(-1); });
+  $("#room-next").addEventListener("click", function () { step(1); });
+  document.addEventListener("keydown", function (e) {
+    if (!current) return;
+    if (e.key === "Escape") closeRoom();
+    else if (e.key === "ArrowRight") step(1);
+    else if (e.key === "ArrowLeft") step(-1);
+    else if (e.key === "Tab") { // keep focus inside the room
+      var f = $$("button, a[href]", room).filter(function (x) { return x.offsetParent; });
+      if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+  window.addEventListener("popstate", fromHash);
+
+  /* ---------------- cursor ---------------- */
+  var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var cursor = $(".cursor"), dot = $(".cursor-dot"), ring = $(".cursor-ring"), label = $(".cursor-label");
+  var mouse = { x: innerWidth / 2, y: innerHeight / 2, seen: false }, ringPos = { x: mouse.x, y: mouse.y };
+  window.addEventListener("pointermove", function (e) {
+    mouse.x = e.clientX; mouse.y = e.clientY; mouse.seen = true;
+    if (!fine) return;
+    dot.style.transform = "translate(" + e.clientX + "px," + e.clientY + "px)";
+    var w = e.target.closest && e.target.closest("[data-work]");
+    var a = e.target.closest && e.target.closest("a,button");
+    cursor.classList.toggle("is-work", !!w);
+    cursor.classList.toggle("is-link", !w && !!a);
+    if (w) label.textContent = t(UI.view);
+  }, { passive: true });
+  if (fine && !reduced) {
+    document.body.classList.add("has-cursor");
+    (function loop() {
+      ringPos.x += (mouse.x - ringPos.x) * 0.16; ringPos.y += (mouse.y - ringPos.y) * 0.16;
+      ring.style.transform = "translate(" + ringPos.x + "px," + ringPos.y + "px)";
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  /* ---------------- magnetic field of iron filings ----------------
+     Two poles: one follows the visitor, one is a slow-orbiting "black hole".
+     Every filing turns toward the resulting field, like iron filings around
+     the magnets in her brooches. */
+  function Field(canvas, opts) {
+    var ctx = canvas.getContext("2d"), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W, H, pts = [], running = false, visible = true, t0 = performance.now();
+    var hand = { x: 0, y: 0, tx: 0, ty: 0 };
+    function size() {
+      var r = canvas.getBoundingClientRect();
+      W = r.width; H = r.height;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var gap = W < 700 ? 20 : opts.gap || 22;
+      pts = [];
+      for (var y = gap / 2; y < H; y += gap) for (var x = gap / 2; x < W; x += gap) {
+        pts.push({ x: x + (Math.random() - .5) * gap * .7, y: y + (Math.random() - .5) * gap * .7, a: Math.random() * Math.PI, l: 5 + Math.random() * 6 });
+      }
+      hand.x = hand.tx = W * opts.hx; hand.y = hand.ty = H * opts.hy;
+    }
+    function hole(time) {
+      var s = time * 0.00007 * opts.speed;
+      return { x: W * opts.bx + Math.cos(s) * W * .06, y: H * opts.by + Math.sin(s * 1.3) * H * .06 };
+    }
+    function draw(now) {
+      var r = canvas.getBoundingClientRect();
+      if (mouse.seen && mouse.y > r.top && mouse.y < r.bottom) { hand.tx = mouse.x - r.left; hand.ty = mouse.y - r.top; }
+      else { var s = (now - t0) * 0.0002; hand.tx = W * opts.hx + Math.cos(s) * W * .14; hand.ty = H * opts.hy + Math.sin(s * 1.7) * H * .16; }
+      hand.x += (hand.tx - hand.x) * 0.07; hand.y += (hand.ty - hand.y) * 0.07;
+      var b = hole(now - t0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.lineCap = "round";
+      var signal = opts.signal;
+      for (var i = 0; i < pts.length; i++) {
+        var p = pts[i];
+        var dx1 = p.x - hand.x, dy1 = p.y - hand.y, d1 = dx1 * dx1 + dy1 * dy1 + 400, r1 = Math.sqrt(d1);
+        var dx2 = p.x - b.x, dy2 = p.y - b.y, d2 = dx2 * dx2 + dy2 * dy2 + 400, r2 = Math.sqrt(d2);
+        // + pole at the hand, − pole at the black hole (stronger)
+        var fx = dx1 / (d1 * r1) - 1.6 * dx2 / (d2 * r2);
+        var fy = dy1 / (d1 * r1) - 1.6 * dy2 / (d2 * r2);
+        var target = Math.atan2(fy, fx);
+        var diff = target - p.a;
+        diff = ((diff + Math.PI / 2) % Math.PI + Math.PI) % Math.PI - Math.PI / 2; // filings have no head or tail
+        p.a += diff * 0.12;
+        var mag = Math.sqrt(fx * fx + fy * fy) * 9e4;
+        var alpha = Math.min(.85, .1 + mag * .5);
+        if (r2 < opts.holeR * 1.05) continue; // swallowed
+        var near = Math.max(0, 1 - r1 / 160);
+        ctx.strokeStyle = near > 0.02 ? "rgba(" + Math.round(239 + (226 - 239) * near) + "," + Math.round(231 + (72 - 231) * near) + "," + Math.round(221 + (31 - 221) * near) + "," + Math.min(1, alpha + near * .5) + ")" : "rgba(239,231,221," + alpha + ")";
+        ctx.lineWidth = .8 + near * .9;
+        var c = Math.cos(p.a) * p.l * .5, s = Math.sin(p.a) * p.l * .5;
+        ctx.beginPath(); ctx.moveTo(p.x - c, p.y - s); ctx.lineTo(p.x + c, p.y + s); ctx.stroke();
+      }
+      // the black hole: a dark disc with a thin event-horizon ring
+      ctx.beginPath(); ctx.arc(b.x, b.y, opts.holeR, 0, Math.PI * 2);
+      ctx.fillStyle = "#050404"; ctx.fill();
+      ctx.lineWidth = 1; ctx.strokeStyle = "rgba(239,231,221,.35)"; ctx.stroke();
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(-0.4);
+      ctx.beginPath(); ctx.ellipse(0, 0, opts.holeR * 2.1, opts.holeR * .5, 0, Math.PI * 1.05, Math.PI * 1.95);
+      ctx.strokeStyle = "rgba(226,72,31,.55)"; ctx.stroke(); ctx.restore();
+      // the hand's pole
+      ctx.beginPath(); ctx.arc(hand.x, hand.y, 3, 0, Math.PI * 2); ctx.fillStyle = signal; ctx.fill();
+    }
+    function loop(now) { if (!running) return; draw(now); requestAnimationFrame(loop); }
+    function start() { if (running || reduced) return; running = true; requestAnimationFrame(loop); }
+    function stop() { running = false; }
+    size();
+    if (reduced) { for (var k = 0; k < 60; k++) draw(performance.now()); }
+    new IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) start(); else stop(); }).observe(canvas);
+    var to; window.addEventListener("resize", function () { clearTimeout(to); to = setTimeout(function () { size(); if (reduced) draw(performance.now()); }, 150); });
+  }
+
+  /* ---------------- boot ---------------- */
+  document.documentElement.lang = lang;
+  $("#year").textContent = new Date().getFullYear();
+  render();
+  var mobile = innerWidth < 700;
+  new Field($("#field"), { gap: 22, hx: .3, hy: .4, bx: mobile ? .7 : .72, by: mobile ? .3 : .42, holeR: mobile ? 34 : 58, speed: 1, signal: "#e2481f" });
+  new Field($("#field2"), { gap: 26, hx: .3, hy: .5, bx: .78, by: .5, holeR: mobile ? 26 : 44, speed: .7, signal: "#e2481f" });
+  fromHash();
+})();
