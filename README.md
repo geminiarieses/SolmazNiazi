@@ -31,6 +31,7 @@ Several design versions live side by side so they can be compared:
 - `/4/` — étude 4: like étude 3, but past the horizon the brooch itself appears, rebuilt in 3D (`assets/js/brooch.js`) and seen from straight above, turning as you scroll.
 - `/5/` — étude 5: the 3D brooch is the hero from the first screen, turning with the scroll while her statement unfolds; at the end the view sinks into its silver dome, which reflects a black hole.
 - `/6/` — étude 6: minimal. Paper and ink; a schematic black hole drawn only with circles and straight or diagonal lines. Each line of her statement changes the drawing as you scroll; the cursor and a gentle parallax follow the mouse.
+- `/7/` — étude 7: zoom in, through a wormhole, zoom out. Scrolling zooms into a small black circle, travels a tunnel of circles past each work (click one to open it; the far end bends toward the mouse), leaves through a white circle and zooms back out to one small black circle.
 
 All études share the same content (`assets/js/content.js`) and images (`assets/img/`).
 A small "Étude" switcher sits bottom-left on every version. To add étude 3, copy the `2/` folder to `3/` and add a link to the switcher in each `index.html`.
