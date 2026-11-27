@@ -103,8 +103,13 @@
 
   function renderContact() {
     var out = [];
-    if (CONTACT.email) out.push("<a href='mailto:" + esc(CONTACT.email) + "'>" + esc(CONTACT.email) + "</a>");
-    if (CONTACT.instagram) out.push("<a href='https://instagram.com/" + esc(CONTACT.instagram) + "' target='_blank' rel='noopener'>Instagram ↗</a>");
+    if (CONTACT.sample) { // placeholder details: shown as text only, so nobody is sent to an address she doesn't own
+      if (CONTACT.email) out.push("<span class='sample'>" + esc(CONTACT.email) + "</span>");
+      if (CONTACT.instagram) out.push("<span class='sample'>@" + esc(CONTACT.instagram) + "</span>");
+    } else {
+      if (CONTACT.email) out.push("<a href='mailto:" + esc(CONTACT.email) + "'>" + esc(CONTACT.email) + "</a>");
+      if (CONTACT.instagram) out.push("<a href='https://instagram.com/" + esc(CONTACT.instagram) + "' target='_blank' rel='noopener'>Instagram ↗</a>");
+    }
     if (!out.length) out.push("<span class='pending'>" + esc(t(UI.contactPending)) + "</span>");
     $("#contactlinks").innerHTML = out.join("");
     $("#contactloc").textContent = t(CONTACT.location);

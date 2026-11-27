@@ -220,6 +220,7 @@ section { position: relative; }
 .contact-links { display: flex; flex-direction: column; gap: 10px; }
 .contact-links a { font-family: var(--serif); font-size: clamp(28px, 4.6vw, 64px); line-height: 1.1; text-decoration: none; background: linear-gradient(var(--signal), var(--signal)) 0 100% / 0 1px no-repeat; transition: background-size .7s var(--ease); width: fit-content; word-break: break-word; }
 .contact-links a:hover { background-size: 100% 1px; }
+.contact-links .sample { font-family: var(--serif); font-size: clamp(28px, 4.6vw, 64px); line-height: 1.1; word-break: break-word; }
 .contact-links .pending { font-family: var(--serif); font-style: italic; font-size: clamp(24px, 3vw, 40px); color: rgba(239,231,221,.6); }
 .contact-loc { margin-top: 40px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: rgba(239,231,221,.55); }
 

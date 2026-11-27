@@ -7,8 +7,10 @@
  */
 
 window.CONTACT = {
-  email: "",        // e.g. "studio@solmazniazi.com" — shown in Contact when filled in
-  instagram: "",    // e.g. "solmazniazi" (without @)
+  // SAMPLE values: replace with her real details. While sample is true they show as plain text, not clickable links.
+  sample: true,
+  email: "studio@solmazniazi.com",
+  instagram: "solmazniazi",   // without @
   location: { en: "Hasselt, Belgium", nl: "Hasselt, België", fr: "Hasselt, Belgique" }
 };
 
