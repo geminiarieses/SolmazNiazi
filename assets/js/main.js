@@ -252,7 +252,7 @@
      the magnets in her brooches. */
   function Field(canvas, opts) {
     var ctx = canvas.getContext("2d"), dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var W, H, pts = [], running = false, visible = true, t0 = performance.now();
+    var W, H, pts = [], disc = [], running = false, visible = true, t0 = performance.now();
     var hand = { x: 0, y: 0, tx: 0, ty: 0 };
     function size() {
       var r = canvas.getBoundingClientRect();
@@ -265,6 +265,102 @@
         pts.push({ x: x + (Math.random() - .5) * gap * .7, y: y + (Math.random() - .5) * gap * .7, a: Math.random() * Math.PI, l: 5 + Math.random() * 6 });
       }
       hand.x = hand.tx = W * opts.hx; hand.y = hand.ty = H * opts.hy;
+      disc = [];
+      var n = W < 700 ? 380 : 720;
+      for (var k = 0; k < n; k++) {
+        var u = Math.pow(Math.random(), 1.7); // denser toward the inner edge
+        disc.push({ th: Math.random() * Math.PI * 2, r: 1.45 + u * 2.3, tr: .1 + Math.random() * .32, w: .35 + Math.random() * .9 });
+      }
+    }
+
+    /* The black hole, drawn the way it would look to an eye nearby:
+       a black shadow, a thin photon ring, a tilted accretion disc that crosses
+       in front of it, and the far side of the disc bent up over the top by
+       its gravity. Brighter on the side turning toward us, hotter toward the centre. */
+    var TILT = .2, ROT = -.16;
+    function discColor(rr, th, a) {
+      var k = Math.min(1, (rr - 1.45) / 2.3);
+      var dop = .45 + .55 * (0.5 + 0.5 * Math.cos(th + 0.4)); // the approaching side burns brighter
+      var R = Math.round(255 + (226 - 255) * k), G = Math.round(238 + (84 - 238) * k), B = Math.round(214 + (40 - 214) * k);
+      return "rgba(" + R + "," + G + "," + B + "," + (a * dop * (1 - k * .55)).toFixed(3) + ")";
+    }
+    // soft continuous bands under the streaks, so the disc reads as glowing gas rather than dashes
+    function band(R, from, to, lensed, alpha) {
+      var lg = ctx.createLinearGradient(-R * 3.8, 0, R * 3.8, 0);
+      lg.addColorStop(0, "rgba(255,236,210," + alpha + ")");
+      lg.addColorStop(.45, "rgba(250,170,110," + alpha * .8 + ")");
+      lg.addColorStop(1, "rgba(200,70,30," + alpha * .45 + ")");
+      ctx.strokeStyle = lg;
+      for (var k = 0; k < 16; k++) {
+        var f = k / 15, w = R * .16;
+        ctx.lineWidth = w;
+        ctx.globalAlpha = (1 - f) * (1 - f) * .9 + .1;
+        ctx.beginPath();
+        if (lensed) ctx.arc(0, 0, R * (1.1 + f * .55), from, to);
+        else { var rr = R * (1.5 + f * 2.2); ctx.ellipse(0, 0, rr, rr * TILT, 0, from, to); }
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+    function drawHole(b, time) {
+      var R = opts.holeR, spin = time * 0.00042 * opts.speed;
+      ctx.save();
+      ctx.translate(b.x, b.y); ctx.rotate(ROT);
+      // warm haze
+      var g = ctx.createRadialGradient(0, 0, R * .9, 0, 0, R * 5.5);
+      g.addColorStop(0, "rgba(226,110,50,.20)"); g.addColorStop(.35, "rgba(160,60,30,.07)"); g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R * 5.5, 0, Math.PI * 2); ctx.fill();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.lineCap = "round";
+      var i, p, th, rr, a0, a1;
+      band(R, Math.PI, Math.PI * 2, false, .05);
+      band(R, Math.PI * 1.02, Math.PI * 1.98, true, .09);
+      // 1. far half of the disc (behind the shadow)
+      for (i = 0; i < disc.length; i++) {
+        p = disc[i]; th = p.th + spin * Math.pow(1.45 / p.r, 1.5) * 3; rr = p.r * R;
+        if (Math.sin(th) >= 0) continue;
+        a0 = th - p.tr; ctx.strokeStyle = discColor(p.r, th, .55); ctx.lineWidth = p.w;
+        ctx.beginPath(); ctx.moveTo(Math.cos(a0) * rr, Math.sin(a0) * rr * TILT); ctx.lineTo(Math.cos(th) * rr, Math.sin(th) * rr * TILT); ctx.stroke();
+      }
+      // 2. the far side again, lensed up and over the top of the shadow
+      for (i = 0; i < disc.length; i++) {
+        p = disc[i]; th = p.th + spin * Math.pow(1.45 / p.r, 1.5) * 3;
+        var sn = Math.sin(th); if (sn >= 0) continue;
+        rr = R * (1.08 + (p.r - 1.45) * .26);
+        // squeeze the angle toward the top so the arch hugs the shadow
+        a1 = Math.PI + ((th % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI);
+        a0 = a1 - p.tr * 1.4;
+        ctx.strokeStyle = discColor(p.r, th, .7); ctx.lineWidth = p.w * .9;
+        ctx.beginPath(); ctx.arc(0, 0, rr, a0, a1); ctx.stroke();
+      }
+      // 3. faint secondary image under the shadow
+      for (i = 0; i < disc.length; i += 3) {
+        p = disc[i]; th = p.th + spin * Math.pow(1.45 / p.r, 1.5) * 3;
+        if (Math.sin(th) < 0) continue;
+        rr = R * (1.04 + (p.r - 1.45) * .07);
+        ctx.strokeStyle = discColor(p.r, th, .35); ctx.lineWidth = .7;
+        ctx.beginPath(); ctx.arc(0, 0, rr, th - p.tr, th); ctx.stroke();
+      }
+      ctx.globalCompositeOperation = "source-over";
+      // 4. the shadow itself
+      var sg = ctx.createRadialGradient(0, 0, R * .7, 0, 0, R * 1.02);
+      sg.addColorStop(0, "#000"); sg.addColorStop(1, "#050303");
+      ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fill();
+      // 5. photon ring
+      ctx.globalCompositeOperation = "lighter";
+      ctx.shadowColor = "rgba(255,200,150,.9)"; ctx.shadowBlur = 12;
+      ctx.strokeStyle = "rgba(255,232,205,.75)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(0, 0, R * 1.025, 0, Math.PI * 2); ctx.stroke();
+      ctx.shadowBlur = 0;
+      // 6. near half of the disc, crossing in front of the shadow
+      band(R, 0, Math.PI, false, .07);
+      for (i = 0; i < disc.length; i++) {
+        p = disc[i]; th = p.th + spin * Math.pow(1.45 / p.r, 1.5) * 3; rr = p.r * R;
+        if (Math.sin(th) < 0) continue;
+        a0 = th - p.tr; ctx.strokeStyle = discColor(p.r, th, .9); ctx.lineWidth = p.w * 1.15;
+        ctx.beginPath(); ctx.moveTo(Math.cos(a0) * rr, Math.sin(a0) * rr * TILT); ctx.lineTo(Math.cos(th) * rr, Math.sin(th) * rr * TILT); ctx.stroke();
+      }
+      ctx.restore();
     }
     function hole(time) {
       var s = time * 0.00007 * opts.speed;
@@ -284,28 +380,25 @@
         var dx1 = p.x - hand.x, dy1 = p.y - hand.y, d1 = dx1 * dx1 + dy1 * dy1 + 400, r1 = Math.sqrt(d1);
         var dx2 = p.x - b.x, dy2 = p.y - b.y, d2 = dx2 * dx2 + dy2 * dy2 + 400, r2 = Math.sqrt(d2);
         // + pole at the hand, − pole at the black hole (stronger)
-        var fx = dx1 / (d1 * r1) - 1.6 * dx2 / (d2 * r2);
-        var fy = dy1 / (d1 * r1) - 1.6 * dy2 / (d2 * r2);
+        // plus a tangential pull, so filings spiral into the hole instead of pointing straight at it
+        var fx = dx1 / (d1 * r1) - 1.6 * dx2 / (d2 * r2) + 1.1 * dy2 / (d2 * r2);
+        var fy = dy1 / (d1 * r1) - 1.6 * dy2 / (d2 * r2) - 1.1 * dx2 / (d2 * r2);
         var target = Math.atan2(fy, fx);
         var diff = target - p.a;
         diff = ((diff + Math.PI / 2) % Math.PI + Math.PI) % Math.PI - Math.PI / 2; // filings have no head or tail
         p.a += diff * 0.12;
         var mag = Math.sqrt(fx * fx + fy * fy) * 9e4;
         var alpha = Math.min(.85, .1 + mag * .5);
-        if (r2 < opts.holeR * 1.05) continue; // swallowed
+        var R0 = opts.holeR;
+        if (r2 < R0 * 1.9) continue; // swallowed by the disc
+        alpha *= Math.min(1, (r2 - R0 * 1.9) / (R0 * 1.6));
         var near = Math.max(0, 1 - r1 / 160);
         ctx.strokeStyle = near > 0.02 ? "rgba(" + Math.round(239 + (226 - 239) * near) + "," + Math.round(231 + (72 - 231) * near) + "," + Math.round(221 + (31 - 221) * near) + "," + Math.min(1, alpha + near * .5) + ")" : "rgba(239,231,221," + alpha + ")";
         ctx.lineWidth = .8 + near * .9;
         var c = Math.cos(p.a) * p.l * .5, s = Math.sin(p.a) * p.l * .5;
         ctx.beginPath(); ctx.moveTo(p.x - c, p.y - s); ctx.lineTo(p.x + c, p.y + s); ctx.stroke();
       }
-      // the black hole: a dark disc with a thin event-horizon ring
-      ctx.beginPath(); ctx.arc(b.x, b.y, opts.holeR, 0, Math.PI * 2);
-      ctx.fillStyle = "#050404"; ctx.fill();
-      ctx.lineWidth = 1; ctx.strokeStyle = "rgba(239,231,221,.35)"; ctx.stroke();
-      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(-0.4);
-      ctx.beginPath(); ctx.ellipse(0, 0, opts.holeR * 2.1, opts.holeR * .5, 0, Math.PI * 1.05, Math.PI * 1.95);
-      ctx.strokeStyle = "rgba(226,72,31,.55)"; ctx.stroke(); ctx.restore();
+      drawHole(b, now - t0);
       // the hand's pole
       ctx.beginPath(); ctx.arc(hand.x, hand.y, 3, 0, Math.PI * 2); ctx.fillStyle = signal; ctx.fill();
     }
@@ -323,7 +416,7 @@
   $("#year").textContent = new Date().getFullYear();
   render();
   var mobile = innerWidth < 700;
-  new Field($("#field"), { gap: 22, hx: .3, hy: .4, bx: mobile ? .7 : .72, by: mobile ? .3 : .42, holeR: mobile ? 34 : 58, speed: 1, signal: "#e2481f" });
-  new Field($("#field2"), { gap: 26, hx: .3, hy: .5, bx: .78, by: .5, holeR: mobile ? 26 : 44, speed: .7, signal: "#e2481f" });
+  new Field($("#field"), { gap: 22, hx: .3, hy: .4, bx: mobile ? .7 : .72, by: mobile ? .3 : .42, holeR: mobile ? 30 : 46, speed: 1, signal: "#e2481f" });
+  new Field($("#field2"), { gap: 26, hx: .3, hy: .5, bx: .78, by: .5, holeR: mobile ? 20 : 36, speed: .7, signal: "#e2481f" });
   fromHash();
 })();
