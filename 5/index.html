@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solmaz Niazi — Contemporary artist & jewellery designer</title>
+  <meta name="description" content="Solmaz Niazi is an Iranian-born contemporary artist and jewellery designer based in Belgium, working in sculpture, installation, performance and wearable objects.">
+  <meta property="og:title" content="Solmaz Niazi">
+  <meta property="og:description" content="Contemporary artist & jewellery designer, Belgium. Sculpture, installation, performance, jewellery.">
+  <meta property="og:image" content="../assets/img/works/longing-for-union-2.jpg">
+  <meta property="og:type" content="website">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#120e0d">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500&family=Vazirmatn:wght@200;300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#works">Skip to works</a>
+
+  <div class="splash" id="splash" aria-hidden="true"><div class="splash-half l"></div><div class="splash-half r"></div><span class="splash-slit"></span><span class="splash-name">Solmaz Niazi</span></div>
+  <script>try{if(!sessionStorage.getItem("sn-splash")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("splashing");sessionStorage.setItem("sn-splash","1")}}catch(e){}</script>
+
+  <div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"><em class="cursor-label"></em></span></div>
+
+  <header class="nav" id="nav">
+    <a href="#top" class="nav-mark" aria-label="Solmaz Niazi, home">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="6"/><ellipse cx="20" cy="20" rx="17" ry="7" transform="rotate(-24 20 20)"/></svg>
+      <span>Solmaz Niazi</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#works" data-t="navWorks">Works</a>
+      <a href="#about" data-t="navAbout">About</a>
+      <a href="#cv" data-t="navCv">CV</a>
+      <a href="#contact" data-t="navContact">Contact</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="en">EN</button><button data-lang="nl">NL</button><button data-lang="fr">FR</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO, étude 5: the brooch "Longing for Union", rebuilt in 3D and seen from straight above,
+         turns as you scroll while her statement unfolds; at the end the view sinks into its mirror. -->
+    <div class="hero-track" id="hero-track">
+    <section class="hero" aria-label="Introduction">
+      <div class="b5" id="b5"><canvas id="brooch-hero" aria-label="Longing for Union, brooch, seen from above"></canvas></div>
+      <div class="hero-inner">
+        <p class="hero-station"><span class="dash"></span><span class="fa-inline" lang="fa" dir="rtl">تمنای وصال</span><span aria-hidden="true">·</span><span data-t="longingTitle">Longing for Union</span></p>
+        <h1 class="hero-name">
+          <span class="line"><span class="word">Solmaz</span></span>
+          <span class="line"><span class="word italic">Niazi</span></span>
+        </h1>
+        <p class="hero-role" data-t="role">Contemporary artist &amp; jewellery designer</p>
+      </div>
+      <div class="fall" id="fall" aria-live="polite"></div>
+      <a class="feature" href="#/work/longing-for-union" data-work="longing-for-union">
+        <img src="../assets/img/works/longing-for-union-2-sm.jpg" alt="" width="450" height="450">
+        <span class="feature-txt"><small data-t="latest">Latest work</small><span data-t="longingTitle">Longing for Union</span><em class="fa-inline" lang="fa" dir="rtl">تمنای وصال</em></span>
+        <i aria-hidden="true">→</i>
+      </a>
+      <a class="hero-scroll" href="#works"><span data-t="fallIn">Scroll to fall in</span><i></i></a>
+      <div class="fall-progress" aria-hidden="true"><i id="fall-bar"></i></div>
+      <div class="dive-veil" aria-hidden="true"></div>
+    </section>
+    </div>
+
+    <!-- WORKS, arranged as stations -->
+    <section class="works" id="works" aria-labelledby="works-title">
+      <div class="works-head">
+        <h2 id="works-title" class="section-title"><span data-t="worksTitle">Works</span></h2>
+        <div class="filters" role="tablist" aria-label="Filter works" id="filters"></div>
+      </div>
+      <div id="stations"></div>
+    </section>
+
+    <!-- INTERLUDE: the poem -->
+    <section class="interlude" aria-labelledby="poem-title">
+      <div class="orbit-deco" aria-hidden="true"><i></i><i></i><i></i></div>
+      <h2 id="poem-title" class="poem-title" data-t="poemTitle">Dance with me</h2>
+      <div class="poem" id="poem"></div>
+      <p class="poem-credit" data-t="poemCredit"></p>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about" aria-labelledby="about-title">
+      <figure class="about-portrait reveal">
+        <div class="portrait-orbit" aria-hidden="true"></div>
+        <img src="../assets/img/works/portrait.jpg" alt="Solmaz Niazi at work at the jeweller's bench" loading="lazy" width="431" height="574">
+      </figure>
+      <div class="about-text">
+        <h2 id="about-title" class="section-title" data-t="aboutTitle">About</h2>
+        <div id="bio" class="bio"></div>
+        <blockquote class="pull reveal"><p data-t="quote"></p><cite>— Solmaz Niazi</cite></blockquote>
+      </div>
+    </section>
+
+    <!-- CV -->
+    <section class="cv" id="cv" aria-labelledby="cv-title">
+      <h2 id="cv-title" class="section-title" data-t="cvTitle">Curriculum</h2>
+      <div class="cv-grid" id="cvgrid"></div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact" aria-labelledby="contact-title">
+      <canvas class="field field--small" id="field2" aria-hidden="true"></canvas>
+      <div class="contact-inner">
+        <h2 id="contact-title" class="section-title" data-t="contactTitle">Contact</h2>
+        <p class="contact-line" data-t="contactLine"></p>
+        <div class="contact-links" id="contactlinks"></div>
+        <p class="contact-loc" id="contactloc"></p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="etudes" aria-label="Design études"><span>Étude</span><a href="../">1</a><a href="../2/">2</a><a href="../3/">3</a><a href="../4/">4</a><a href="../5/" aria-current="page">5</a></nav>
+  <footer class="foot">
+    <span>© <span id="year"></span> Solmaz Niazi</span>
+    <span data-t="rights"></span>
+  </footer>
+
+  <!-- WORK ROOM (opens over the page) -->
+  <div class="room" id="room" role="dialog" aria-modal="true" aria-labelledby="room-title" hidden>
+    <button class="room-close" id="room-close"><span data-t="close">Close</span> <i aria-hidden="true">×</i></button>
+    <div class="room-scroll" id="room-scroll">
+      <div class="room-info">
+        <p class="room-meta" id="room-meta"></p>
+        <h2 class="room-title" id="room-title"></h2>
+        <p class="room-sub" id="room-sub"></p>
+        <dl class="room-spec" id="room-spec"></dl>
+        <div class="room-text" id="room-text"></div>
+      </div>
+      <div class="room-images" id="room-images"></div>
+    </div>
+    <nav class="room-nav" aria-label="Works">
+      <button id="room-prev" data-t-aria="prev">←</button>
+      <span id="room-count"></span>
+      <button id="room-next" data-t-aria="next">→</button>
+    </nav>
+  </div>
+
+  <noscript><p class="noscript">This site uses JavaScript to show the works.</p></noscript>
+  <script src="../assets/js/content.js"></script>
+  <script src="../assets/js/brooch.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
