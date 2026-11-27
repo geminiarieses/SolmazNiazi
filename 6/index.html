@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solmaz Niazi — Contemporary artist & jewellery designer</title>
+  <meta name="description" content="Solmaz Niazi is an Iranian-born contemporary artist and jewellery designer based in Belgium, working in sculpture, installation, performance and wearable objects.">
+  <meta property="og:title" content="Solmaz Niazi">
+  <meta property="og:description" content="Contemporary artist & jewellery designer, Belgium. Sculpture, installation, performance, jewellery.">
+  <meta property="og:image" content="../assets/img/works/kaaba-2.jpg">
+  <meta property="og:type" content="website">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#efebe4">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500&family=Vazirmatn:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#works">Skip to works</a>
+
+  <div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"><em class="cursor-label"></em></span></div>
+
+  <header class="nav" id="nav">
+    <a href="#top" class="nav-mark" aria-label="Solmaz Niazi, home">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="6" class="f"/><circle cx="20" cy="20" r="13"/><line x1="4" y1="36" x2="36" y2="4"/></svg>
+      <span>Solmaz Niazi</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#works" data-t="navWorks">Works</a>
+      <a href="#about" data-t="navAbout">About</a>
+      <a href="#cv" data-t="navCv">CV</a>
+      <a href="#contact" data-t="navContact">Contact</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="en">EN</button><button data-lang="nl">NL</button><button data-lang="fr">FR</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO, étude 6: a schematic black hole, drawn only with circles and straight lines.
+         Scrolling steps through her statement; each line changes the drawing. -->
+    <div class="track6" id="track6">
+    <section class="hero6" id="hero6" data-step="0" aria-label="Introduction">
+      <svg class="bh6" id="bh6" viewBox="-100 -100 200 200" aria-hidden="true">
+        <defs>
+          <clipPath id="front"><rect x="-120" y="0" width="240" height="120"/></clipPath>
+          <clipPath id="inHorizon"><circle r="20"/></clipPath>
+        </defs>
+        <g class="layer" data-depth="1.6"><g id="stars" class="stars"></g></g>
+        <g class="layer" data-depth=".5">
+          <line class="axis" x1="-150" y1="150" x2="150" y2="-150"/>
+          <line class="ray" x1="-150" y1="-62" x2="-19.2" y2="-5.6"/>
+          <line class="ray" x1="150" y1="58" x2="18.9" y2="6.5"/>
+          <line class="ray" x1="-40" y1="150" x2="-6.9" y2="18.8"/>
+        </g>
+        <g class="layer" data-depth=".9">
+          <circle class="isco" r="60"/>
+          <g class="disc" id="disc" transform="rotate(-16)"></g>
+        </g>
+        <g class="layer" data-depth=".25">
+          <circle class="horizon" r="20"/>
+          <g class="disc-front" transform="rotate(-16)" clip-path="url(#inHorizon)"><g id="discFront" clip-path="url(#front)"></g></g>
+          <circle class="photon" r="30"/>
+          <g class="mirror"><circle class="m1" r="20"/><circle class="m2" r="13"/><circle class="m3" r="4"/><line x1="-14.1" y1="14.1" x2="14.1" y2="-14.1"/></g>
+          <circle class="particle" id="particle" r="2"/>
+          <g class="labels">
+            <line x1="14.1" y1="14.1" x2="44" y2="44"/><text x="46" y="48">r<tspan dy="1.5" font-size="3.2">s</tspan></text>
+            <line x1="-21.2" y1="21.2" x2="-50" y2="50"/><text x="-52" y="56" text-anchor="end">1.5 r<tspan dy="1.5" font-size="3.2">s</tspan></text>
+            <line x1="42.4" y1="-42.4" x2="58" y2="-58"/><text x="60" y="-60">3 r<tspan dy="1.5" font-size="3.2">s</tspan></text>
+          </g>
+        </g>
+      </svg>
+      <div class="hero6-text">
+        <h1 class="name6"><span>Solmaz</span> <span>Niazi</span></h1>
+        <p class="role6" data-t="role">Contemporary artist &amp; jewellery designer</p>
+        <p class="work6"><span class="fa-inline" lang="fa" dir="rtl">تمنای وصال</span> · <span data-t="longingTitle">Longing for Union</span></p>
+      </div>
+      <div class="steps6" id="steps6" aria-live="polite"></div>
+      <a class="scroll6" href="#works"><span data-t="scrollIn">Scroll</span></a>
+    </section>
+    </div>
+
+    <!-- WORKS, arranged as stations -->
+    <section class="works" id="works" aria-labelledby="works-title">
+      <div class="works-head">
+        <h2 id="works-title" class="section-title"><span data-t="worksTitle">Works</span></h2>
+        <div class="filters" role="tablist" aria-label="Filter works" id="filters"></div>
+      </div>
+      <div id="stations"></div>
+    </section>
+
+    <!-- INTERLUDE: the poem -->
+    <section class="interlude" aria-labelledby="poem-title">
+      <h2 id="poem-title" class="poem-title" data-t="poemTitle">Dance with me</h2>
+      <div class="poem" id="poem"></div>
+      <p class="poem-credit" data-t="poemCredit"></p>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about" aria-labelledby="about-title">
+      <figure class="about-portrait reveal">
+        <div class="portrait-orbit" aria-hidden="true"></div>
+        <img src="../assets/img/works/portrait.jpg" alt="Solmaz Niazi at work at the jeweller's bench" loading="lazy" width="431" height="574">
+      </figure>
+      <div class="about-text">
+        <h2 id="about-title" class="section-title" data-t="aboutTitle">About</h2>
+        <div id="bio" class="bio"></div>
+        <blockquote class="pull reveal"><p data-t="quote"></p><cite>— Solmaz Niazi</cite></blockquote>
+      </div>
+    </section>
+
+    <!-- CV -->
+    <section class="cv" id="cv" aria-labelledby="cv-title">
+      <h2 id="cv-title" class="section-title" data-t="cvTitle">Curriculum</h2>
+      <div class="cv-grid" id="cvgrid"></div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact" aria-labelledby="contact-title">
+      <div class="contact-inner">
+        <h2 id="contact-title" class="section-title" data-t="contactTitle">Contact</h2>
+        <p class="contact-line" data-t="contactLine"></p>
+        <div class="contact-links" id="contactlinks"></div>
+        <p class="contact-loc" id="contactloc"></p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="etudes" aria-label="Design études"><span>Étude</span><a href="../">1</a><a href="../2/">2</a><a href="../3/">3</a><a href="../4/">4</a><a href="../5/">5</a><a href="../6/" aria-current="page">6</a></nav>
+  <footer class="foot">
+    <span>© <span id="year"></span> Solmaz Niazi</span>
+    <span data-t="rights"></span>
+  </footer>
+
+  <!-- WORK ROOM (opens over the page) -->
+  <div class="room" id="room" role="dialog" aria-modal="true" aria-labelledby="room-title" hidden>
+    <button class="room-close" id="room-close"><span data-t="close">Close</span> <i aria-hidden="true">×</i></button>
+    <div class="room-scroll" id="room-scroll">
+      <div class="room-info">
+        <p class="room-meta" id="room-meta"></p>
+        <h2 class="room-title" id="room-title"></h2>
+        <p class="room-sub" id="room-sub"></p>
+        <dl class="room-spec" id="room-spec"></dl>
+        <div class="room-text" id="room-text"></div>
+      </div>
+      <div class="room-images" id="room-images"></div>
+    </div>
+    <nav class="room-nav" aria-label="Works">
+      <button id="room-prev" data-t-aria="prev">←</button>
+      <span id="room-count"></span>
+      <button id="room-next" data-t-aria="next">→</button>
+    </nav>
+  </div>
+
+  <noscript><p class="noscript">This site uses JavaScript to show the works.</p></noscript>
+  <script src="../assets/js/content.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
