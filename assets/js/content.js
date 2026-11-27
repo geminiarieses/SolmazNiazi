@@ -32,6 +32,9 @@ window.UI = {
   },
   latest: { en: "Latest work", nl: "Nieuwste werk", fr: "Œuvre récente" },
   scrollIn: { en: "Scroll to enter", nl: "Scroll om binnen te gaan", fr: "Défilez pour entrer" },
+  longingTitle: { en: "Longing for Union", nl: "Verlangen naar eenwording", fr: "Désir d’union" },
+  fallIn: { en: "Scroll to fall in", nl: "Scroll om te vallen", fr: "Défilez pour tomber" },
+  mirrorLine: { en: "In the centre, a mirror.", nl: "In het midden, een spiegel.", fr: "Au centre, un miroir." },
   navWorks: { en: "Works", nl: "Werk", fr: "Œuvres" },
   navAbout: { en: "About", nl: "Over", fr: "À propos" },
   navCv: { en: "CV", nl: "CV", fr: "CV" },
@@ -99,6 +102,34 @@ window.UI = {
     fr: "Toutes les images © Solmaz Niazi."
   }
 };
+
+/* "Longing for Union": her statement, in fragments. fa is her own text; en/nl/fr are translations. */
+window.LONGING = [
+  { fa: "از روزی که پدرم را از دست داده‌ام، یا شاید بهتر است بگویم، صدایش، نگاهش و حضورش را گم کرده‌ام، هر روز بیشتر به کیهان و کهکشان‌ها پناه برده‌ام.",
+    en: "Since the day I lost my father, or rather lost his voice, his gaze, his presence, I have taken refuge a little more each day in the cosmos and the galaxies.",
+    nl: "Sinds de dag dat ik mijn vader verloor, of beter gezegd zijn stem, zijn blik, zijn aanwezigheid, zoek ik elke dag meer mijn toevlucht in de kosmos en de sterrenstelsels.",
+    fr: "Depuis le jour où j’ai perdu mon père, ou plutôt sa voix, son regard, sa présence, je me réfugie chaque jour un peu plus dans le cosmos et les galaxies." },
+  { fa: "جایی که حس می‌کنم او آنجاست، در میان ستارگان و در عمق سیاه‌چاله‌ها.",
+    en: "A place where I feel he is: among the stars, in the depths of black holes.",
+    nl: "Een plek waar ik voel dat hij is: tussen de sterren, in de diepte van zwarte gaten.",
+    fr: "Un lieu où je sens qu’il se trouve : parmi les étoiles, au fond des trous noirs." },
+  { fa: "سیاه‌چاله، ناحیه‌ای از فضا-زمان است که گرانش آن چنان قدرتمند است که هیچ‌چیز، حتی نور، نمی‌تواند از چنگال آن بگریزد.",
+    en: "A black hole is a region of space-time whose gravity is so strong that nothing, not even light, can escape its grip.",
+    nl: "Een zwart gat is een gebied in de ruimtetijd waarvan de zwaartekracht zo sterk is dat niets, zelfs geen licht, eraan kan ontsnappen.",
+    fr: "Un trou noir est une région de l’espace-temps dont la gravité est si forte que rien, pas même la lumière, ne peut échapper à son emprise." },
+  { fa: "گاز و غبار، پیش از آنکه به درون سیاه‌چاله فرو افتند، در اطراف آن به‌صورت مارپیچی و با سرعتی سرسام‌آور می‌چرخند.",
+    en: "Gas and dust, before they fall in, spiral around it at a dizzying speed.",
+    nl: "Gas en stof draaien, voordat ze erin vallen, in spiralen rond het gat, met duizelingwekkende snelheid.",
+    fr: "Gaz et poussières, avant d’y tomber, tournent autour en spirale à une vitesse vertigineuse." },
+  { fa: "او ممکن است اکنون ذره‌ای از سیاه‌چاله‌ای در کیهان باشد.",
+    en: "He may now be a particle of a black hole somewhere in the universe.",
+    nl: "Misschien is hij nu een deeltje van een zwart gat ergens in het heelal.",
+    fr: "Il est peut-être aujourd’hui une particule d’un trou noir quelque part dans l’univers." },
+  { fa: "حالا شاید حتی خودم را هم بتوانم در آن سیاه‌چاله ببینم؛ این قطعه برای من بازتابی است از تمنای وصال در آیینه‌ی هستی.",
+    en: "Perhaps now I can even see myself in that black hole. For me this piece is a reflection of the longing for union, in the mirror of existence.",
+    nl: "Misschien kan ik nu zelfs mezelf in dat zwarte gat zien. Dit stuk is voor mij een weerspiegeling van het verlangen naar eenwording, in de spiegel van het bestaan.",
+    fr: "Peut-être puis-je même me voir dans ce trou noir. Cette pièce est pour moi le reflet du désir d’union, dans le miroir de l’existence." }
+];
 
 window.CATEGORIES = [
   { id: "sculpture", n: "I",   label: { en: "Sculpture & Installation", nl: "Sculptuur & installatie", fr: "Sculpture & installation" } },
@@ -178,6 +209,16 @@ window.WORKS = [
       fr: "Au ModeMuseum de Hasselt, j’ai réalisé une performance inspirée du mouvement « Femme, Vie, Liberté », un mouvement qui a poussé des gens du monde entier à couper leurs cheveux en signe de solidarité. Pendant la performance, j’ai attaché mes cheveux au mur derrière moi. Les participants ont coupé peu à peu mes mèches avec de petits ciseaux. À chaque coupe, je devenais un peu plus libre ; ce geste rendait visible l’idée de solidarité et de force collective. À la fin, lorsque tous mes cheveux avaient été coupés, j’atteignais la liberté complète. Cette performance est un appel à tous, partout dans le monde, à travailler ensemble et à se soutenir dans la lutte pour la liberté et l’émancipation des femmes."
     },
     images: [["liberator-perf-1", 672, 896], ["liberator-perf-4", 410, 274], ["liberator-perf-3", 512, 342], ["liberator-perf-2", 310, 461]]
+  },
+  {
+    id: "longing-for-union", cat: "jewellery", year: "",
+    title: { en: "Longing for Union", nl: "Verlangen naar eenwording", fr: "Désir d’union", fa: "تمنای وصال" },
+    sub: { en: "Brooch. Mourning jewellery", nl: "Broche. Rouwjuweel", fr: "Broche. Bijou de deuil" },
+    medium: { en: "Asphalt-black Alumide, silver, copper filament", nl: "Asfaltzwart Alumide, zilver, koperfilament", fr: "Alumide noir asphalte, argent, filament de cuivre" },
+    credit: { en: "Model: Flynn Tietgat", nl: "Model: Flynn Tietgat", fr: "Modèle : Flynn Tietgat" },
+    video: "longing-for-union",
+    statement: true,
+    images: [["longing-for-union-2", 450, 450], ["longing-for-union-1", 480, 480]]
   },
   {
     id: "liberator", cat: "jewellery", year: "2022",
