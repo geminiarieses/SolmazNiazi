@@ -147,8 +147,10 @@
     if (w.text) text += t(w.text).split("\n\n").map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("");
     if (w.quote) text += "<p class='lead' style='font-size:22px'>“" + esc(t(UI.quote)) + "”</p>";
     if (w.poem) text += "<p class='poem-mini'>" + esc(t(UI.poem)) + "</p>";
+    if (w.statement && window.LONGING) text += window.LONGING.map(function (f) { return "<p>" + esc(t(f)) + "</p>"; }).join("");
+    if (w.credit) text += "<p style='opacity:.6;font-size:13px'>" + esc(t(w.credit)) + "</p>";
     $("#room-text").innerHTML = text;
-    $("#room-images").innerHTML = w.images.map(function (img, i) {
+    $("#room-images").innerHTML = (w.video ? "<figure><video src='assets/video/" + w.video + ".mp4' poster='assets/video/" + w.video + "-poster.jpg' autoplay muted loop playsinline style='max-height:88vh;max-width:100%;margin:0 auto;display:block'></video></figure>" : "") + w.images.map(function (img, i) {
       return "<figure><img src='assets/img/works/" + img[0] + ".jpg' alt='" + esc(t(w.title)) + " — " + (i + 1) + "' width='" + img[1] + "' height='" + img[2] + "'" + (i ? " loading='lazy'" : "") + "></figure>";
     }).join("");
     var list = visibleWorks(), idx = list.indexOf(w);
