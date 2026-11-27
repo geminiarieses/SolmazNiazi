@@ -19,6 +19,9 @@
 <body>
   <a class="skip" href="#works">Skip to works</a>
 
+  <div class="splash" id="splash" aria-hidden="true"><div class="splash-half l"></div><div class="splash-half r"></div><span class="splash-slit"></span><span class="splash-name">Solmaz Niazi</span></div>
+  <script>try{if(!sessionStorage.getItem("sn-splash")&&!matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("splashing");sessionStorage.setItem("sn-splash","1")}}catch(e){}</script>
+
   <div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"><em class="cursor-label"></em></span></div>
 
   <header class="nav" id="nav">
@@ -39,6 +42,7 @@
 
   <main id="top">
     <!-- HERO: a field of iron filings that turns toward the visitor -->
+    <div class="hero-track" id="hero-track">
     <section class="hero" aria-label="Introduction">
       <canvas class="field" id="field" aria-hidden="true"></canvas>
       <div class="hero-inner">
@@ -50,8 +54,15 @@
         <p class="hero-role" data-t="role">Contemporary artist &amp; jewellery designer</p>
       </div>
       <p class="hero-hint" data-t="heroHint">Move — the field follows you.</p>
-      <a class="hero-scroll" href="#works" aria-label="Scroll to works"><span></span></a>
+      <a class="feature" href="#/work/kaaba" data-work="kaaba">
+        <img src="assets/img/works/kaaba-2-sm.jpg" alt="" width="471" height="836">
+        <span class="feature-txt"><small data-t="latest">Latest work</small><span>Kaaba</span><em>2026</em></span>
+        <i aria-hidden="true">→</i>
+      </a>
+      <a class="hero-scroll" href="#works"><span data-t="scrollIn">Scroll to enter</span><i></i></a>
+      <div class="dive-veil" aria-hidden="true"></div>
     </section>
+    </div>
 
     <!-- WORKS, arranged as stations -->
     <section class="works" id="works" aria-labelledby="works-title">

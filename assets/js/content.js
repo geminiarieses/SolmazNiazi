@@ -30,6 +30,8 @@ window.UI = {
     nl: "Beweeg — het veld volgt je.",
     fr: "Bougez — le champ vous suit."
   },
+  latest: { en: "Latest work", nl: "Nieuwste werk", fr: "Œuvre récente" },
+  scrollIn: { en: "Scroll to enter", nl: "Scroll om binnen te gaan", fr: "Défilez pour entrer" },
   navWorks: { en: "Works", nl: "Werk", fr: "Œuvres" },
   navAbout: { en: "About", nl: "Over", fr: "À propos" },
   navCv: { en: "CV", nl: "CV", fr: "CV" },
